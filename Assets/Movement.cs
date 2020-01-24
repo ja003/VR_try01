@@ -28,7 +28,7 @@ public class Movement : MonoBehaviour
 	[SerializeField]
 	Camera camera;
 
-	Direction direction = Direction.None;
+	EDirection btnDirection = EDirection.None;
 
 	bool isAdjustingRotation;
 
@@ -40,7 +40,10 @@ public class Movement : MonoBehaviour
 
 	private void Update()
 	{
-		Move(direction);
+		Move(GetWantedMove());
+
+		//if(btnDirection == EDirection.None)
+		JoystickInput();
 
 		float rotateYDiff = Mathf.Abs(
 			origin.transform.localRotation.eulerAngles.y -
@@ -59,39 +62,67 @@ public class Movement : MonoBehaviour
 				  Quaternion.Euler(0, camera.transform.rotation.eulerAngles.y, 0),
 				  rotateSpeed * Time.deltaTime);
 		}
-
-		if(direction != Direction.None)
-			JoystickInput();
 	}
+
+	GameObject hitBtnObject;
+
 
 	private void JoystickInput()
 	{
-		if(Input.GetKey(KeyCode.JoystickButton3))
-			MoveRight();
-		else if(Input.GetKey(KeyCode.JoystickButton0))
-			MoveLeft();
-		else if(Input.GetKey(KeyCode.JoystickButton2))
-			MoveForward();
-		else if(Input.GetKey(KeyCode.JoystickButton1))
-			MoveBack();
-		else
-			StopMove();
-
-
 		if(Input.GetKey(KeyCode.JoystickButton4) ||
-			Input.GetKey(KeyCode.A))
+			Input.GetKey(KeyCode.Q))
 		{
-			Debug.Log("Click");
-			//ExecuteEvents.Execute(btnForward.gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+			RaycastHit hit;
+			Physics.Raycast(new Ray(camera.transform.position, camera.transform.forward),
+				out hit);
 
-			ExecuteEvents.Execute(btnForward.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
+
+			if(hit.transform != null)
+			{
+				hitBtnObject = hit.transform.gameObject;
+				ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
+				Debug.Log("pointerDownHandler " + hitBtnObject.name);
+
+			}
 		}
 
+		else if(hitBtnObject != null && (
+			Input.GetKeyUp(KeyCode.JoystickButton4) ||
+			Input.GetKeyUp(KeyCode.Q)))
+		{
+			ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerUpHandler);
+			Debug.Log("pointerUpHandler " + hitBtnObject.name);
+		}
 
 		//if(Input.GetKey(KeyCode.JoystickButton5))
 		//	...();
 		//if(Input.GetKey(KeyCode.JoystickButton4))
 		//	...();
+	}
+
+	private EDirection GetWantedMove()
+	{
+		if(Input.GetKey(KeyCode.JoystickButton2) ||
+					Input.GetKey(KeyCode.W) ||
+					btnDirection == EDirection.Forward)
+			return EDirection.Forward;
+
+		if(Input.GetKey(KeyCode.JoystickButton3) ||
+					Input.GetKey(KeyCode.D) ||
+					btnDirection == EDirection.Right)
+			return EDirection.Right;
+
+		if(Input.GetKey(KeyCode.JoystickButton1) ||
+					Input.GetKey(KeyCode.S) ||
+					btnDirection == EDirection.Back)
+			return EDirection.Back;
+
+		if(Input.GetKey(KeyCode.JoystickButton0) ||
+				Input.GetKey(KeyCode.A) ||
+				btnDirection == EDirection.Left)
+			return EDirection.Left;
+
+		return EDirection.None;
 	}
 
 	public void UpdateVisibility()
@@ -117,45 +148,48 @@ public class Movement : MonoBehaviour
 		}
 	}
 
+	//bool isMoveSetForward;
+
 	public void MoveForward()
 	{
-		direction = Direction.Forward;
+		//isMoveSetForward = true;
+		btnDirection = EDirection.Forward;
 	}
 	public void MoveRight()
 	{
-		direction = Direction.Right;
+		btnDirection = EDirection.Right;
 	}
 	public void MoveBack()
 	{
-		direction = Direction.Back;
+		btnDirection = EDirection.Back;
 	}
 	public void MoveLeft()
 	{
-		direction = Direction.Left;
+		btnDirection = EDirection.Left;
 	}
 
 	public void StopMove()
 	{
-		direction = Direction.None;
+		btnDirection = EDirection.None;
 	}
 
-	private void Move(Direction pDir)
+	private void Move(EDirection pDir)
 	{
 		Vector3 dir = Vector3.zero;
 		switch(pDir)
 		{
-			case Direction.Forward:
+			case EDirection.Forward:
 				//dir = Vector3.forward;
 				dir = camera.transform.forward;
 				break;
-			case Direction.Right:
+			case EDirection.Right:
 				dir = camera.transform.right;
 				break;
-			case Direction.Back:
+			case EDirection.Back:
 				dir = -camera.transform.forward;
 				//dir = Vector3.back;
 				break;
-			case Direction.Left:
+			case EDirection.Left:
 				dir = -camera.transform.right;
 				break;
 		}
@@ -167,7 +201,7 @@ public class Movement : MonoBehaviour
 
 }
 
-public enum Direction
+public enum EDirection
 {
 	None,
 	Forward,
