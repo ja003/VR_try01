@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Movement : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class Movement : MonoBehaviour
 	[SerializeField] MeshRenderer btnBack;
 	[SerializeField] MeshRenderer btnLeft;
 
-	private void FixedUpdate()
+	private void Update()
 	{
 		Move(direction);
 
@@ -59,10 +60,39 @@ public class Movement : MonoBehaviour
 				  rotateSpeed * Time.deltaTime);
 		}
 
-
-
+		if(direction != Direction.None)
+			JoystickInput();
 	}
-	//bool isCameraLookingDown;
+
+	private void JoystickInput()
+	{
+		if(Input.GetKey(KeyCode.JoystickButton3))
+			MoveRight();
+		else if(Input.GetKey(KeyCode.JoystickButton0))
+			MoveLeft();
+		else if(Input.GetKey(KeyCode.JoystickButton2))
+			MoveForward();
+		else if(Input.GetKey(KeyCode.JoystickButton1))
+			MoveBack();
+		else
+			StopMove();
+
+
+		if(Input.GetKey(KeyCode.JoystickButton4) ||
+			Input.GetKey(KeyCode.A))
+		{
+			Debug.Log("Click");
+			//ExecuteEvents.Execute(btnForward.gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+
+			ExecuteEvents.Execute(btnForward.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
+		}
+
+
+		//if(Input.GetKey(KeyCode.JoystickButton5))
+		//	...();
+		//if(Input.GetKey(KeyCode.JoystickButton4))
+		//	...();
+	}
 
 	public void UpdateVisibility()
 	{
