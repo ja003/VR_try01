@@ -16,6 +16,12 @@ public class Movement : MonoBehaviour
 
 
 	[SerializeField]
+	float cameraLookDowsnMin;
+	[SerializeField]
+	float cameraLookDowsnMax;
+
+
+	[SerializeField]
 	Transform origin;
 
 	[SerializeField]
@@ -25,11 +31,10 @@ public class Movement : MonoBehaviour
 
 	bool isAdjustingRotation;
 
-	private void Update()
+	private void FixedUpdate()
 	{
 		Move(direction);
-		//origin.transform.localRotation =
-		//	Quaternion.Euler(0, camera.transform.rotation.eulerAngles.y, 0);
+
 		float rotateYDiff = Mathf.Abs(
 			origin.transform.localRotation.eulerAngles.y -
 			camera.transform.rotation.eulerAngles.y);
@@ -48,7 +53,15 @@ public class Movement : MonoBehaviour
 				  rotateSpeed * Time.deltaTime);
 		}
 
-		//origin.Rotate(Vector3.up, camera.transform.rotation.eulerAngles.y);
+	}
+
+	public void UpdateVisibility()
+	{
+		bool isCameraLookingDown = 
+			camera.transform.localRotation.eulerAngles.x > cameraLookDowsnMin &&
+			camera.transform.localRotation.eulerAngles.x < cameraLookDowsnMax;
+
+		gameObject.SetActive(isCameraLookingDown);
 	}
 
 	public void MoveForward()
