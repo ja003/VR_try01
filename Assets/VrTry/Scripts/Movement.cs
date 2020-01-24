@@ -27,7 +27,7 @@ public class Movement : MonoBehaviour
 
 	[SerializeField]
 	Camera camera;
-	
+
 	bool isAdjustingRotation;
 
 	[SerializeField] ActionKey btnForward;
@@ -60,13 +60,13 @@ public class Movement : MonoBehaviour
 		}
 	}
 
-	GameObject hitBtnObject;
+	ActionKey hitBtnObject;
 
 
 	private void JoystickInput()
 	{
-		if(Input.GetKey(KeyCode.JoystickButton4) ||
-			Input.GetKey(KeyCode.Q))
+		//todo: fix - dont allow press different button while key is pressed
+		if(IsActionKeyPressed(EActionKey.Click))
 		{
 			Physics.Raycast(new Ray(
 				camera.transform.position, camera.transform.forward),
@@ -74,15 +74,35 @@ public class Movement : MonoBehaviour
 
 			if(hit.transform != null)
 			{
-				hitBtnObject = hit.transform.gameObject;
-				ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
+				hitBtnObject = hit.transform.gameObject.GetComponent<ActionKey>();
+				if(hitBtnObject != null)
+				{
+					btnForward.SetNotPressed();
+					btnRight.SetNotPressed();
+					btnBack.SetNotPressed();
+					btnLeft.SetNotPressed();
+
+					hitBtnObject.SetPressed();
+
+					//ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
+					Debug.Log("down");
+				}
 
 			}
 		}
 
-		else if(hitBtnObject != null && IsActionKeyPressed(EActionKey.Click))
+		//else if(/*hitBtnObject != null && */!IsActionKeyPressed(EActionKey.Click))
+		else
 		{
-			ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerUpHandler);
+			//hitBtnObject.SetNotPressed();
+
+			btnForward.SetNotPressed();
+			btnRight.SetNotPressed();
+			btnBack.SetNotPressed();
+			btnLeft.SetNotPressed();
+
+			//ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerUpHandler);
+			Debug.Log("up");
 		}
 	}
 
@@ -125,9 +145,10 @@ public class Movement : MonoBehaviour
 				return Input.GetKey(KeyCode.JoystickButton0) ||
 					Input.GetKey(KeyCode.A) ||
 					btnLeft.IsPressed;
+
 			case EActionKey.Click:
-				return Input.GetKeyUp(KeyCode.JoystickButton4) ||
-					Input.GetKeyUp(KeyCode.Q);
+				return Input.GetKey(KeyCode.JoystickButton4) ||
+					Input.GetKey(KeyCode.Q);
 
 			case EActionKey.Interact:
 				break;
@@ -142,7 +163,7 @@ public class Movement : MonoBehaviour
 		bool isCameraLookingDown =
 			camera.transform.localRotation.eulerAngles.x > cameraLookDowsnMin &&
 			camera.transform.localRotation.eulerAngles.x < cameraLookDowsnMax;
-		
+
 		float diffMin = Mathf.Abs(camera.transform.localRotation.eulerAngles.x - cameraLookDowsnMin);
 		float diffMax = Mathf.Abs(camera.transform.localRotation.eulerAngles.x - cameraLookDowsnMax);
 		float diff = Mathf.Min(diffMax, diffMin);
