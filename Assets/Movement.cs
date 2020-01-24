@@ -28,15 +28,15 @@ public class Movement : MonoBehaviour
 	[SerializeField]
 	Camera camera;
 
-	EDirection btnDirection = EDirection.None;
+	//EDirection btnDirection = EDirection.None;
 
 	bool isAdjustingRotation;
 
 
-	[SerializeField] MeshRenderer btnForward;
-	[SerializeField] MeshRenderer btnRight;
-	[SerializeField] MeshRenderer btnBack;
-	[SerializeField] MeshRenderer btnLeft;
+	[SerializeField] ActionKey btnForward;
+	[SerializeField] ActionKey btnRight;
+	[SerializeField] ActionKey btnBack;
+	[SerializeField] ActionKey btnLeft;
 
 	private void Update()
 	{
@@ -86,9 +86,7 @@ public class Movement : MonoBehaviour
 			}
 		}
 
-		else if(hitBtnObject != null && (
-			Input.GetKeyUp(KeyCode.JoystickButton4) ||
-			Input.GetKeyUp(KeyCode.Q)))
+		else if(hitBtnObject != null && IsActionKeyPressed(EActionKey.Click))
 		{
 			ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerUpHandler);
 			Debug.Log("pointerUpHandler " + hitBtnObject.name);
@@ -102,27 +100,55 @@ public class Movement : MonoBehaviour
 
 	private EDirection GetWantedMove()
 	{
-		if(Input.GetKey(KeyCode.JoystickButton2) ||
-					Input.GetKey(KeyCode.W) ||
-					btnDirection == EDirection.Forward)
+		if(IsActionKeyPressed(EActionKey.MoveForward))
 			return EDirection.Forward;
 
-		if(Input.GetKey(KeyCode.JoystickButton3) ||
-					Input.GetKey(KeyCode.D) ||
-					btnDirection == EDirection.Right)
+		if(IsActionKeyPressed(EActionKey.MoveRight))
 			return EDirection.Right;
 
-		if(Input.GetKey(KeyCode.JoystickButton1) ||
-					Input.GetKey(KeyCode.S) ||
-					btnDirection == EDirection.Back)
+		if(IsActionKeyPressed(EActionKey.MoveBack))
 			return EDirection.Back;
 
-		if(Input.GetKey(KeyCode.JoystickButton0) ||
-				Input.GetKey(KeyCode.A) ||
-				btnDirection == EDirection.Left)
+		if(IsActionKeyPressed(EActionKey.MoveLeft))
 			return EDirection.Left;
 
 		return EDirection.None;
+	}
+
+	private bool IsActionKeyPressed(EActionKey pKey)
+	{
+		switch(pKey)
+		{
+			case EActionKey.None:
+				break;
+			case EActionKey.MoveForward:
+				return Input.GetKey(KeyCode.JoystickButton2) ||
+					Input.GetKey(KeyCode.W) ||
+					btnForward.IsPressed;
+			case EActionKey.MoveRight:
+				return Input.GetKey(KeyCode.JoystickButton3) ||
+					Input.GetKey(KeyCode.D) ||
+					btnRight.IsPressed;
+			case EActionKey.MoveBack:
+				return Input.GetKey(KeyCode.JoystickButton1) ||
+					Input.GetKey(KeyCode.S) ||
+					btnBack.IsPressed;
+			case EActionKey.MoveLeft:
+				return Input.GetKey(KeyCode.JoystickButton0) ||
+					Input.GetKey(KeyCode.A) ||
+					btnLeft.IsPressed;
+			case EActionKey.Click:
+				return Input.GetKeyUp(KeyCode.JoystickButton4) ||
+					Input.GetKeyUp(KeyCode.Q);
+
+			case EActionKey.Interact:
+				break;
+			default:
+				break;
+
+		}
+
+		return false;
 	}
 
 	public void UpdateVisibility()
@@ -139,39 +165,40 @@ public class Movement : MonoBehaviour
 
 		if(!isCameraLookingDown)
 		{
-			Color c = btnForward.material.color;
+			//todo: make method in btn
+			Color c = btnForward.Renderer.material.color;
 			float diffCoeff = diff / 10;
-			btnForward.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
-			btnRight.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
-			btnBack.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
-			btnLeft.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+			btnForward.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+			btnRight.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+			btnBack.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+			btnLeft.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
 		}
 	}
 
 	//bool isMoveSetForward;
 
-	public void MoveForward()
-	{
-		//isMoveSetForward = true;
-		btnDirection = EDirection.Forward;
-	}
-	public void MoveRight()
-	{
-		btnDirection = EDirection.Right;
-	}
-	public void MoveBack()
-	{
-		btnDirection = EDirection.Back;
-	}
-	public void MoveLeft()
-	{
-		btnDirection = EDirection.Left;
-	}
+	//public void MoveForward()
+	//{
+	//	//isMoveSetForward = true;
+	//	btnDirection = EDirection.Forward;
+	//}
+	//public void MoveRight()
+	//{
+	//	btnDirection = EDirection.Right;
+	//}
+	//public void MoveBack()
+	//{
+	//	btnDirection = EDirection.Back;
+	//}
+	//public void MoveLeft()
+	//{
+	//	btnDirection = EDirection.Left;
+	//}
 
-	public void StopMove()
-	{
-		btnDirection = EDirection.None;
-	}
+	//public void StopMove()
+	//{
+	//	btnDirection = EDirection.None;
+	//}
 
 	private void Move(EDirection pDir)
 	{
@@ -179,7 +206,6 @@ public class Movement : MonoBehaviour
 		switch(pDir)
 		{
 			case EDirection.Forward:
-				//dir = Vector3.forward;
 				dir = camera.transform.forward;
 				break;
 			case EDirection.Right:
@@ -187,7 +213,6 @@ public class Movement : MonoBehaviour
 				break;
 			case EDirection.Back:
 				dir = -camera.transform.forward;
-				//dir = Vector3.back;
 				break;
 			case EDirection.Left:
 				dir = -camera.transform.right;
@@ -208,4 +233,17 @@ public enum EDirection
 	Right,
 	Back,
 	Left
+}
+
+public enum EActionKey
+{
+	None,
+
+	MoveForward,
+	MoveRight,
+	MoveBack,
+	MoveLeft,
+
+	Click,
+	Interact
 }
