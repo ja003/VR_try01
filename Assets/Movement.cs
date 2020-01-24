@@ -8,7 +8,12 @@ public class Movement : MonoBehaviour
 	Player player;
 
 	[SerializeField]
-	float speed = 1;
+	float moveSpeed = 1;
+	[SerializeField]
+	float rotateSpeed = 1;
+	[SerializeField]
+	float maxRotateYDiff = 10;
+
 
 	[SerializeField]
 	Transform origin;
@@ -18,11 +23,31 @@ public class Movement : MonoBehaviour
 
 	Direction direction = Direction.None;
 
+	bool isAdjustingRotation;
+
 	private void Update()
 	{
 		Move(direction);
-		origin.transform.localRotation = 
-			Quaternion.Euler(0, camera.transform.rotation.eulerAngles.y, 0);
+		//origin.transform.localRotation =
+		//	Quaternion.Euler(0, camera.transform.rotation.eulerAngles.y, 0);
+		float rotateYDiff = Mathf.Abs(
+			origin.transform.localRotation.eulerAngles.y -
+			camera.transform.rotation.eulerAngles.y);
+
+		if(rotateYDiff > maxRotateYDiff)
+			isAdjustingRotation = true;
+		else if(rotateYDiff < 1)
+			isAdjustingRotation = false;
+
+
+		if(isAdjustingRotation)
+		{
+			origin.transform.localRotation = Quaternion.RotateTowards(
+				  origin.transform.localRotation,
+				  Quaternion.Euler(0, camera.transform.rotation.eulerAngles.y, 0),
+				  rotateSpeed * Time.deltaTime);
+		}
+
 		//origin.Rotate(Vector3.up, camera.transform.rotation.eulerAngles.y);
 	}
 
@@ -70,10 +95,10 @@ public class Movement : MonoBehaviour
 		}
 		dir.y = 0;
 
-		player.transform.position += dir * Time.deltaTime * speed;
+		player.transform.position += dir * Time.deltaTime * moveSpeed;
 	}
 
-	
+
 }
 
 public enum Direction
