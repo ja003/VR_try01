@@ -31,6 +31,12 @@ public class Movement : MonoBehaviour
 
 	bool isAdjustingRotation;
 
+
+	[SerializeField] MeshRenderer btnForward;
+	[SerializeField] MeshRenderer btnRight;
+	[SerializeField] MeshRenderer btnBack;
+	[SerializeField] MeshRenderer btnLeft;
+
 	private void FixedUpdate()
 	{
 		Move(direction);
@@ -53,15 +59,32 @@ public class Movement : MonoBehaviour
 				  rotateSpeed * Time.deltaTime);
 		}
 
+
+
 	}
+	//bool isCameraLookingDown;
 
 	public void UpdateVisibility()
 	{
-		bool isCameraLookingDown = 
+		bool isCameraLookingDown =
 			camera.transform.localRotation.eulerAngles.x > cameraLookDowsnMin &&
 			camera.transform.localRotation.eulerAngles.x < cameraLookDowsnMax;
 
-		gameObject.SetActive(isCameraLookingDown);
+		//gameObject.SetActive(isCameraLookingDown);
+
+		float diffMin = Mathf.Abs(camera.transform.localRotation.eulerAngles.x - cameraLookDowsnMin);
+		float diffMax = Mathf.Abs(camera.transform.localRotation.eulerAngles.x - cameraLookDowsnMax);
+		float diff = Mathf.Min(diffMax, diffMin);
+
+		if(!isCameraLookingDown)
+		{
+			Color c = btnForward.material.color;
+			float diffCoeff = diff / 10;
+			btnForward.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+			btnRight.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+			btnBack.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+			btnLeft.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+		}
 	}
 
 	public void MoveForward()
@@ -96,14 +119,14 @@ public class Movement : MonoBehaviour
 				dir = camera.transform.forward;
 				break;
 			case Direction.Right:
-				dir = Vector3.right;
+				dir = camera.transform.right;
 				break;
 			case Direction.Back:
 				dir = -camera.transform.forward;
 				//dir = Vector3.back;
 				break;
 			case Direction.Left:
-				dir = Vector3.left;
+				dir = -camera.transform.right;
 				break;
 		}
 		dir.y = 0;

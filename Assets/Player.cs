@@ -20,7 +20,5 @@ public class Player : MonoBehaviour
 	void Update()
 	{
 		movement.UpdateVisibility();
-		Debug.Log("rotation = " + camera.transform.rotation.eulerAngles);
-		Debug.Log("localEulerAngles = " + camera.transform.localEulerAngles);
 	}
 }
