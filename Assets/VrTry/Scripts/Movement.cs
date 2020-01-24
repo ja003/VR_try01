@@ -62,47 +62,47 @@ public class Movement : MonoBehaviour
 
 	ActionKey hitBtnObject;
 
+	bool joystickPressed;
 
 	private void JoystickInput()
 	{
-		//todo: fix - dont allow press different button while key is pressed
 		if(IsActionKeyPressed(EActionKey.Click))
 		{
-			Physics.Raycast(new Ray(
-				camera.transform.position, camera.transform.forward),
-				out RaycastHit hit);
-
-			if(hit.transform != null)
+			if(!joystickPressed)
 			{
-				hitBtnObject = hit.transform.gameObject.GetComponent<ActionKey>();
-				if(hitBtnObject != null)
+				Physics.Raycast(new Ray(
+					camera.transform.position, camera.transform.forward),
+					out RaycastHit hit);
+
+				if(hit.transform != null)
 				{
-					btnForward.SetNotPressed();
-					btnRight.SetNotPressed();
-					btnBack.SetNotPressed();
-					btnLeft.SetNotPressed();
+					hitBtnObject = hit.transform.gameObject.GetComponent<ActionKey>();
+					if(hitBtnObject != null)
+					{
+						btnForward.SetNotPressed();
+						btnRight.SetNotPressed();
+						btnBack.SetNotPressed();
+						btnLeft.SetNotPressed();
 
-					hitBtnObject.SetPressed();
+						hitBtnObject.SetPressed();
+						joystickPressed = true;
 
-					//ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
-					Debug.Log("down");
+						//Debug.Log("down");
+					}
+
 				}
-
 			}
 		}
-
-		//else if(/*hitBtnObject != null && */!IsActionKeyPressed(EActionKey.Click))
 		else
 		{
-			//hitBtnObject.SetNotPressed();
+			joystickPressed = false;
 
 			btnForward.SetNotPressed();
 			btnRight.SetNotPressed();
 			btnBack.SetNotPressed();
 			btnLeft.SetNotPressed();
 
-			//ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerUpHandler);
-			Debug.Log("up");
+			//Debug.Log("up");
 		}
 	}
 

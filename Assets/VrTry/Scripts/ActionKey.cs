@@ -19,13 +19,13 @@ public class ActionKey : MonoBehaviour
 	public void SetPressed()
 	{
 		IsPressed = true;
-		Debug.Log(gameObject.name + " pressed");
+		//Debug.Log(gameObject.name + " pressed");
 	}
 
 	public void SetNotPressed()
 	{
 		IsPressed = false;
-		Debug.Log(gameObject.name + " not-pressed");
+		//Debug.Log(gameObject.name + " not-pressed");
 	}
 
 	internal void UpdateColor(float pCameraCloseToButtonCoefficient)
