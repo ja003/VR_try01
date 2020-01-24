@@ -27,11 +27,8 @@ public class Movement : MonoBehaviour
 
 	[SerializeField]
 	Camera camera;
-
-	//EDirection btnDirection = EDirection.None;
-
+	
 	bool isAdjustingRotation;
-
 
 	[SerializeField] ActionKey btnForward;
 	[SerializeField] ActionKey btnRight;
@@ -40,10 +37,9 @@ public class Movement : MonoBehaviour
 
 	private void Update()
 	{
-		Move(GetWantedMove());
-
-		//if(btnDirection == EDirection.None)
 		JoystickInput();
+
+		Move(GetWantedMove());
 
 		float rotateYDiff = Mathf.Abs(
 			origin.transform.localRotation.eulerAngles.y -
@@ -72,16 +68,14 @@ public class Movement : MonoBehaviour
 		if(Input.GetKey(KeyCode.JoystickButton4) ||
 			Input.GetKey(KeyCode.Q))
 		{
-			RaycastHit hit;
-			Physics.Raycast(new Ray(camera.transform.position, camera.transform.forward),
-				out hit);
-
+			Physics.Raycast(new Ray(
+				camera.transform.position, camera.transform.forward),
+				out RaycastHit hit);
 
 			if(hit.transform != null)
 			{
 				hitBtnObject = hit.transform.gameObject;
 				ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
-				Debug.Log("pointerDownHandler " + hitBtnObject.name);
 
 			}
 		}
@@ -89,13 +83,7 @@ public class Movement : MonoBehaviour
 		else if(hitBtnObject != null && IsActionKeyPressed(EActionKey.Click))
 		{
 			ExecuteEvents.Execute(hitBtnObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerUpHandler);
-			Debug.Log("pointerUpHandler " + hitBtnObject.name);
 		}
-
-		//if(Input.GetKey(KeyCode.JoystickButton5))
-		//	...();
-		//if(Input.GetKey(KeyCode.JoystickButton4))
-		//	...();
 	}
 
 	private EDirection GetWantedMove()
@@ -143,8 +131,6 @@ public class Movement : MonoBehaviour
 
 			case EActionKey.Interact:
 				break;
-			default:
-				break;
 
 		}
 
@@ -156,49 +142,21 @@ public class Movement : MonoBehaviour
 		bool isCameraLookingDown =
 			camera.transform.localRotation.eulerAngles.x > cameraLookDowsnMin &&
 			camera.transform.localRotation.eulerAngles.x < cameraLookDowsnMax;
-
-		//gameObject.SetActive(isCameraLookingDown);
-
+		
 		float diffMin = Mathf.Abs(camera.transform.localRotation.eulerAngles.x - cameraLookDowsnMin);
 		float diffMax = Mathf.Abs(camera.transform.localRotation.eulerAngles.x - cameraLookDowsnMax);
 		float diff = Mathf.Min(diffMax, diffMin);
 
 		if(!isCameraLookingDown)
 		{
-			//todo: make method in btn
-			Color c = btnForward.Renderer.material.color;
 			float diffCoeff = diff / 10;
-			btnForward.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
-			btnRight.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
-			btnBack.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
-			btnLeft.Renderer.material.color = new Color(c.r, c.g, c.b, 1 - diffCoeff);
+
+			btnForward.UpdateColor(diffCoeff);
+			btnRight.UpdateColor(diffCoeff);
+			btnBack.UpdateColor(diffCoeff);
+			btnLeft.UpdateColor(diffCoeff);
 		}
 	}
-
-	//bool isMoveSetForward;
-
-	//public void MoveForward()
-	//{
-	//	//isMoveSetForward = true;
-	//	btnDirection = EDirection.Forward;
-	//}
-	//public void MoveRight()
-	//{
-	//	btnDirection = EDirection.Right;
-	//}
-	//public void MoveBack()
-	//{
-	//	btnDirection = EDirection.Back;
-	//}
-	//public void MoveLeft()
-	//{
-	//	btnDirection = EDirection.Left;
-	//}
-
-	//public void StopMove()
-	//{
-	//	btnDirection = EDirection.None;
-	//}
 
 	private void Move(EDirection pDir)
 	{
