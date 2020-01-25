@@ -100,7 +100,10 @@ public class GvrReticlePointer : GvrBasePointer
     public override void OnPointerEnter(RaycastResult raycastResultResult, bool isInteractive)
     {
         SetPointerTarget(raycastResultResult.worldPosition, isInteractive);
+		LastEnteredGO = raycastResultResult.gameObject;
     }
+
+	public GameObject LastEnteredGO { get; private set; }
 
     /// <inheritdoc/>
     public override void OnPointerHover(RaycastResult raycastResultResult, bool isInteractive)

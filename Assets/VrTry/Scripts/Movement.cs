@@ -60,9 +60,12 @@ public class Movement : MonoBehaviour
 		}
 	}
 
-	ActionKey hitBtnObject;
+	//ActionKey hitBtnObject;
 
 	bool joystickPressed;
+
+	[SerializeField]
+	GvrReticlePointer pointer;
 
 	private void JoystickInput()
 	{
@@ -70,26 +73,18 @@ public class Movement : MonoBehaviour
 		{
 			if(!joystickPressed)
 			{
-				Physics.Raycast(new Ray(
-					camera.transform.position, camera.transform.forward),
-					out RaycastHit hit);
+				ActionKey hitBtnObject = pointer.LastEnteredGO.GetComponent<ActionKey>();
 
-				if(hit.transform != null)
+				if(hitBtnObject != null)
 				{
-					hitBtnObject = hit.transform.gameObject.GetComponent<ActionKey>();
-					if(hitBtnObject != null)
-					{
-						btnForward.SetNotPressed();
-						btnRight.SetNotPressed();
-						btnBack.SetNotPressed();
-						btnLeft.SetNotPressed();
+					//Debug.Log(hitBtnObject.name);
+					btnForward.SetNotPressed();
+					btnRight.SetNotPressed();
+					btnBack.SetNotPressed();
+					btnLeft.SetNotPressed();
 
-						hitBtnObject.SetPressed();
-						joystickPressed = true;
-
-						//Debug.Log("down");
-					}
-
+					hitBtnObject.SetPressed();
+					joystickPressed = true;
 				}
 			}
 		}

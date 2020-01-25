@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 6578510664366379557}
   - component: {fileID: 6578510664366379558}
   - component: {fileID: 6578510664366379553}
-  m_Layer: 0
-  m_Name: Forward
+  m_Layer: 8
+  m_Name: ActionKey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -150,4 +150,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPressed: 0
-  Renderer: {fileID: 0}
