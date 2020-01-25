@@ -67,6 +67,9 @@ public class Movement : MonoBehaviour
 	[SerializeField]
 	GvrReticlePointer pointer;
 
+	[SerializeField]
+	FlashLight flashLight;
+
 	private void JoystickInput()
 	{
 		if(IsActionKeyPressed(EActionKey.Click))
@@ -98,6 +101,14 @@ public class Movement : MonoBehaviour
 			btnLeft.SetNotPressed();
 
 			//Debug.Log("up");
+		}
+
+		if(IsActionKeyPressed(EActionKey.Interact))
+		{
+			const int light_intensity = 20;
+			const int light_angle = 100;
+			const int boost_duration = 1;
+			flashLight.SetLight(light_intensity, light_angle, boost_duration);
 		}
 	}
 
@@ -146,7 +157,8 @@ public class Movement : MonoBehaviour
 					Input.GetKey(KeyCode.Q);
 
 			case EActionKey.Interact:
-				break;
+				return Input.GetKey(KeyCode.JoystickButton5) ||
+					Input.GetKey(KeyCode.R);
 
 		}
 
